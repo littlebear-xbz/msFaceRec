@@ -16,8 +16,8 @@ sys.setdefaultencoding('utf-8')
 logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s:::] %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
-                    filename='./log/sendToKafka.log',
-                    filemode='a'
+                    filename='../log/sendToKafka.log',
+                    filemode='w'
                     )
 
 server_list = ['jp-bigdata-03:9092', 'jp-bigdata-04:9092', 'jp-bigdata-05:9092',
@@ -30,10 +30,8 @@ def sendByTime():
     count = 0
     while count < 10000:
         # line = "first+::::from windows::" + str(count)
-        line1 = 'http://wh-dev:8009/Test/001.jpg' + \
-                ":::" + str(datetime.datetime.now())
-        line2 = 'http://139.219.102.23:8003/JojoAndPage.jpg' + \
-                ":::" + str(datetime.datetime.now())
+        line1 = 'http://wh-dev:8009/Test/001.jpg'
+        line2 = 'http://139.219.102.23:8003/JojoAndPage.jpg'
         producer.send(topic='mssend', value=line1)
         producer.send(topic='mssend', value=line2)
         logging.info("发送消息到kafka ，成功")

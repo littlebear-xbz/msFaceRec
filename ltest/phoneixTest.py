@@ -3,7 +3,7 @@
 Created on Tue Jun 27 09:28:25 2017
 @author: Xiongz
 """
-
+from kafka import KafkaConsumer
 import phoenixdb
 database_url = 'http://jp-bigdata-01:8765/'
 conn = phoenixdb.connect(database_url, autocommit=True)
@@ -32,4 +32,54 @@ VALUES('2http://139.219.102.23:8003/JojoAndPage.jpg',
 'http://wh-dev:8009/JojoAndPage/JojoAndPage_1/JojoAndPage_1.jpg|C:\zhiqian\Faces\PDB\438\page.jpg|page|0.7031485'
 )
 """
-cursor.execute(sql)
+recived_txt = "5http://139.219.102.23:8003/JojoAndPage.jpg,success,http://wh-dev:8009/JojoAndPage/JojoAndPage_1/JojoAndPage_1.jpg|C:\zhiqian\Faces\PDB\438\page.jpg|page|0.7031485,http://wh-dev:8009/JojoAndPage/JojoAndPage_2/JojoAndPage_2.jpg|C:\zhiqian\Faces\PDB\436\06-snap0583.jpg|06-snap0583|0.6539416"
+
+
+tmp = recived_txt.split(",")
+url_send = tmp[0]
+recived_status = tmp[1]
+recived_results = ['','','','','','','','','','']
+recived_results[0] = "ceshi123"
+recived_results[1] = "ceshi1234"
+sql_l = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status,result_1,result_2,result_3
+,result_4,result_5,result_6,result_7,result_8,result_9,result_10)
+VALUES('3http://139.219.102.23:8003/JojoAndPage.jpg',
+'http://139.219.102.23:8003/JojoAndPage.jpg',
+'2017-09-13 12:12:12',
+'success',
+'%(result_1)s','%(result_2)s','%(result_3)s','%(result_4)s','%(result_5)s','%(result_6)s',
+'%(result_7)s','%(result_8)s','%(result_9)s','%(result_10)s'
+)
+""" % {"result_1":recived_results[0],"result_2":recived_results[1],"result_3":recived_results[2],
+       "result_4": recived_results[3],"result_5":recived_results[4],"result_6":recived_results[5],
+       "result_7": recived_results[6],"result_8":recived_results[7],"result_9":recived_results[8],
+       "result_10": recived_results[9]}
+
+sql_l2 = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status,result_1,result_2,result_3
+,result_4,result_5,result_6,result_7,result_8,result_9,result_10)
+VALUES('3http://139.219.102.23:8003/JojoAndPage.jpg',
+'http://139.219.102.23:8003/JojoAndPage.jpg',
+'2017-09-13 12:12:12',
+'success',
+'%(result_1)s','%(result_2)s','%(result_3)s','%(result_4)s','%(result_5)s','%(result_6)s',
+'%(result_7)s','%(result_8)s','%(result_9)s','%(result_10)s'
+)
+""" % {"result_1":recived_results[0],"result_2":recived_results[1],"result_3":recived_results[2],
+       "result_4": recived_results[3],"result_5":recived_results[4],"result_6":recived_results[5],
+       "result_7": recived_results[6],"result_8":recived_results[7],"result_9":recived_results[8],
+       "result_10": recived_results[9]}
+
+
+if recived_status == "success":
+    if len(tmp) == 2:
+        pass
+    elif len(tmp) > 2:
+        for i in (2,len(tmp)-1) :
+            recived_results.append(tmp[i])
+
+
+# print recived_results
+cursor.execute(sql_l)
+print sql_l
+
+
