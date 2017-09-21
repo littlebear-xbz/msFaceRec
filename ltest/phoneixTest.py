@@ -70,16 +70,12 @@ VALUES('3http://139.219.102.23:8003/JojoAndPage.jpg',
        "result_10": recived_results[9]}
 
 
-if recived_status == "success":
-    if len(tmp) == 2:
-        pass
-    elif len(tmp) > 2:
-        for i in (2,len(tmp)-1) :
-            recived_results.append(tmp[i])
+sql_l = 'select * from test.ltest'
 
 
 # print recived_results
 cursor.execute(sql_l)
-print sql_l
+for i in cursor.fetchall():
+    print i
 
 

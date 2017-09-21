@@ -6,7 +6,6 @@ Created on Thu Jun 29 10:35:35 2017
 import sys
 from kafka import KafkaConsumer
 from kafka.client import KafkaClient
-from kafka.consumer import SimpleConsumer
 import logging
 
 reload(sys)

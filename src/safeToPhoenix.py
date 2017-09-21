@@ -8,7 +8,7 @@ import phoenixdb
 import logging
 import hashlib
 import datetime
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.DEBUG,
                     format='[%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s:::] %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     filename='../log/safeToPhoenix.log',
@@ -29,9 +29,11 @@ consumer = KafkaConsumer('msreply', group_id='groupltest',bootstrap_servers=serv
 for message in consumer:
     recived_message = message.value
     messagelist = recived_message.split(",")
+    logging.info(messagelist)
     if len(messagelist) == 2:
         if messagelist[1] == 'fail':
             logging.warning(messagelist[0]+"---url not Rec")
+
         elif messagelist[1] == 'noAvator':
             logging.warning(messagelist[0]+'---not found face')
         elif messagelist[1] == 'noCardId':
@@ -48,7 +50,8 @@ for message in consumer:
         rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S')\
         +recived_url_send
         logging.info(rowkey)
-        for i in range(2,len(messagelist)-1):
+        logging.info("list lenth:::"+ str(len(messagelist)))
+        for i in range(2,len(messagelist)):
             recived_results[i-2] = messagelist[i]
         sql_l = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status,result_1,result_2,result_3
         ,result_4,result_5,result_6,result_7,result_8,result_9,result_10)
@@ -64,6 +67,7 @@ for message in consumer:
                "result_4": recived_results[3], "result_5": recived_results[4], "result_6": recived_results[5],
                "result_7": recived_results[6], "result_8": recived_results[7], "result_9": recived_results[8],
                "result_10": recived_results[9]}
+        logging.info(sql_l)
         cursor.execute(sql_l)
 
 
