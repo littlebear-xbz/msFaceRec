@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.DEBUG,
                     )
 
 database_url = 'http://jp-bigdata-01:8765/'
+# database_url = 'http://jh-hadoop-02:8765/'
 conn = phoenixdb.connect(database_url, autocommit=True)
 cursor = conn.cursor()
 cnx = conn
@@ -23,6 +24,8 @@ cnx = conn
 server_list = ['jp-bigdata-03:9092', 'jp-bigdata-04:9092', 'jp-bigdata-05:9092',
                'jp-bigdata-06:9092', 'jp-bigdata-07:9092', 'jp-bigdata-08:9092', 'jp-bigdata-09:9092']
 
+# server_list = ['jh-hadoop-10:9092','jh-hadoop-11:9092','jh-hadoop-12:9092','jh-hadoop-13:9092','jh-hadoop-14:9092','jh-hadoop-15:9092',
+#                   'jh-hadoop-16:9092','jh-hadoop-17:9092','jh-hadoop-18:9092',]
 consumer = KafkaConsumer('msreply', group_id='groupltest',bootstrap_servers=server_list)
 
 
@@ -30,10 +33,25 @@ for message in consumer:
     recived_message = message.value
     messagelist = recived_message.split(",")
     logging.info(messagelist)
+    print messagelist
     if len(messagelist) == 2:
         if messagelist[1] == 'fail':
             logging.warning(messagelist[0]+"---url not Rec")
-
+            recived_url_send = messagelist[0]
+            recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+            recived_status = messagelist[1]
+            print str(messagelist) + "fail"
+            rowkey =  rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S')\
+                                            +recived_url_send
+            sql_l = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status)
+        VALUES('%(rowkey)s',
+        '%(recived_url_send)s',
+        '%(date)s',
+        '%(status)s'
+        )
+        """ % {"rowkey":rowkey,'recived_url_send':recived_url_send,"date":recived_time,"status":recived_status}
+            logging.info(sql_l)
+            cursor.execute(sql_l)
         elif messagelist[1] == 'noAvator':
             logging.warning(messagelist[0]+'---not found face')
         elif messagelist[1] == 'noCardId':

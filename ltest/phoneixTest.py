@@ -6,6 +6,7 @@ Created on Tue Jun 27 09:28:25 2017
 from kafka import KafkaConsumer
 import phoenixdb
 database_url = 'http://jp-bigdata-01:8765/'
+# database_url = 'http://jh-hadoop-02:8765/'
 conn = phoenixdb.connect(database_url, autocommit=True)
 cursor = conn.cursor()
 cnx = conn
