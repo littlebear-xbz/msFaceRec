@@ -53,20 +53,20 @@ url_list = ['http://jp-bigdata-01/images/ltest1.jpg',
             'http://jp-bigdata-01/images/ltest8.jpg',
             'http://jp-bigdata-01/images/ltest9.jpg',
             'http://jp-bigdata-01/images/ltest10.jpg',
-            'http://jp-bigdata-01/images/ltest11.jpg',
-            'http://jp-bigdata-01/images/ltest12.jpg',]
+            'http://jp-bigdata-01/images/cannotfindpeople.jpg',
+            'http://jp-bigdata-01/images/nopeople.jpg']
 # 定时发送测试数据 每隔十分钟发送两条数据
 def sendByTime():
     count = 0
-
     while count < 10000:
         # line = "first+::::from windows::" + str(count)
         line = random.choice(url_list)
         producer.send(topic='mssend', value=line)
         logging.info("Send to kafka ，success" + line)
         producer.flush()
-        time.sleep(600)
+        # time.sleep(600)
         count = count + 1
+        print count
 
 def send(url):
     producer.send(topic='mssend', value=url)
