@@ -37,26 +37,26 @@ for message in consumer:
     if len(messagelist) == 2:
         if messagelist[1] == 'fail':
             logging.warning(messagelist[0]+"---url not Rec")
-            recived_url_send = messagelist[0]
-            recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-            recived_status = messagelist[1]
-            print str(messagelist) + "fail"
-            rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S')\
-                                            +recived_url_send
-            sql_l = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status)
-        VALUES('%(rowkey)s',
-        '%(recived_url_send)s',
-        '%(date)s',
-        '%(status)s'
-        )
-        """ % {"rowkey":rowkey,'recived_url_send':recived_url_send,"date":recived_time,"status":recived_status}
-            logging.info(sql_l)
-            cursor.execute(sql_l)
-        elif messagelist[1] == 'noAvator':
+        elif messagelist[1] == 'noAvatar':
             logging.warning(messagelist[0]+'---not found face')
-        elif messagelist[1] == 'noCardId':
+        elif messagelist[1] == 'noCard':
             logging.warning(messagelist[0]+'---not VIP')
-        pass
+        recived_url_send = messagelist[0]
+        recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        recived_status = messagelist[1]
+        print str(messagelist) + "fail"
+        rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
+                 + recived_url_send
+        sql_l = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status)
+                VALUES('%(rowkey)s',
+                '%(recived_url_send)s',
+                '%(date)s',
+                '%(status)s'
+                )
+                """ % {"rowkey": rowkey, 'recived_url_send': recived_url_send, "date": recived_time,
+                       "status": recived_status}
+        logging.info(sql_l)
+        cursor.execute(sql_l)
     elif len(messagelist) < 2 or len(messagelist) > 12:
         logging.error("message is error")
         logging.error(recived_message)
