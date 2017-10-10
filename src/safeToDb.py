@@ -101,7 +101,7 @@ def safeToMysql(data,cursor,conn):
         recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         recived_status = messagelist[1]
         print str(messagelist) + "fail"
-        rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
+        rowkey = hashlib.md5(recived_url_send + datetime.datetime.now().strftime('%Y%m%d%H%M%S')).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
                  + recived_url_send
         sql_mysql = """INSERT INTO ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status)
                         VALUES('%(rowkey)s',
@@ -122,7 +122,7 @@ def safeToMysql(data,cursor,conn):
         recived_status = messagelist[1]
         recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         recived_results = ['', '', '', '', '', '', '', '', '', '']
-        rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
+        rowkey = hashlib.md5(recived_url_send + datetime.datetime.now().strftime('%Y%m%d%H%M%S')).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
                  + recived_url_send
         logging.info(rowkey)
         logging.info("list lenth:::" + str(len(messagelist)))
@@ -149,6 +149,7 @@ def safeToMysql(data,cursor,conn):
 
 
 if __name__ == "__main__":
+    print "process start"
     bootstrap_servers = CF.get("kafka","bootstrap").split(",")
     kafka_topic = CF.get("kafka","topic")
     kafka_group_id = CF.get("kafka","group_id")
@@ -173,8 +174,12 @@ if __name__ == "__main__":
             logging.debug("safe to Phoenix is no enable")
         #插入数据到mysql
         if CF.get("mysql","enable") == "True":
-            safeToMysql(message.value,cursor=mysql_cursor,conn=mysql_conn)
-            print "safe to mysql doen"
+            try:
+                safeToMysql(message.value,cursor=mysql_cursor,conn=mysql_conn)
+                print "safe to mysql doen"
+            except:
+                logging.warning("The same data")
+                print "Insert into mysql ERROR"
         else:
             logging.debug("safe to mysql is no enable")
 
