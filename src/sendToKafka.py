@@ -64,9 +64,10 @@ def sendByTime():
         producer.send(topic='mssend', value=line)
         logging.info("Send to kafka ，success" + line)
         producer.flush()
-        # time.sleep(600)
+        time.sleep(2)
         count = count + 1
         print count
+        print line
 
 def send(url):
     producer.send(topic='mssend', value=url)

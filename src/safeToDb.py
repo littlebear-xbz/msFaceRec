@@ -16,14 +16,14 @@ import pymysql
 CF = ConfigParser.ConfigParser()
 CF.read('../conf/conf.conf')
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s:::] %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     filename='../log/safeToDb.log',
                     filemode='w'
                     )
 
-def safeToPhoenix(data,cursor):
+def safeToPhoenix(data,cursor,conn):
     recived_message = data
     messagelist = recived_message.split(",")
     logging.info(messagelist)
@@ -82,6 +82,8 @@ def safeToPhoenix(data,cursor):
                    "result_10": recived_results[9]}
         logging.info(sql_phoenix)
         cursor.execute(sql_phoenix)
+        conn.commit()
+
 
 def safeToMysql(data,cursor,conn):
     recived_message = data
@@ -165,13 +167,14 @@ if __name__ == "__main__":
         logging.debug("Recived message value from kafka topic msreply" + message.value)
         #通过phoenix 插入数据到hbase
         if CF.get("phoenix","enable") == "True":
-            safeToPhoenix(data=message.value,cursor=phoenix_cursor)
+            safeToPhoenix(data=message.value,cursor=phoenix_cursor,conn=phoenix_conn)
             print "safe to phoenix doen"
         else:
             logging.debug("safe to Phoenix is no enable")
         #插入数据到mysql
         if CF.get("mysql","enable") == "True":
             safeToMysql(message.value,cursor=mysql_cursor,conn=mysql_conn)
+            print "safe to mysql doen"
         else:
             logging.debug("safe to mysql is no enable")
 

@@ -8,7 +8,7 @@ import phoenixdb
 import logging
 import hashlib
 import datetime
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s:::] %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     filename='../log/safeToPhoenix.log',

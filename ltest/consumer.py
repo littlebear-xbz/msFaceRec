@@ -25,8 +25,8 @@ server_list = ['jp-bigdata-03:9092', 'jp-bigdata-04:9092', 'jp-bigdata-05:9092',
 server_list_jh = ['jh-hadoop-10:9092','jh-hadoop-11:9092','jh-hadoop-12:9092','jh-hadoop-13:9092','jh-hadoop-14:9092','jh-hadoop-15:9092',
                   'jh-hadoop-16:9092','jh-hadoop-17:9092','jh-hadoop-18:9092',]
 
-consumer = KafkaConsumer('msreply', group_id='groupltest',
-                         bootstrap_servers=server_list_jh)
+consumer = KafkaConsumer('mssend', group_id='ltest',
+                         bootstrap_servers=server_list)
 
 
 def listenTopic():
