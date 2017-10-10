@@ -28,7 +28,7 @@ def safeToPhoenix(data,cursor,conn):
     messagelist = recived_message.split(",")
     logging.info(messagelist)
     print messagelist
-    if len(messagelist) == 2:
+    if len(messagelist) == 3:
         if messagelist[1] == 'fail':
             logging.warning(messagelist[0] + "---url not Rec")
         elif messagelist[1] == 'noAvatar':
@@ -36,11 +36,11 @@ def safeToPhoenix(data,cursor,conn):
         elif messagelist[1] == 'noCard':
             logging.warning(messagelist[0] + '---not VIP')
         recived_url_send = messagelist[0]
-        recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        recived_time = messagelist[2]
         recived_status = messagelist[1]
         print str(messagelist) + "fail"
-        rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
-                 + recived_url_send
+        rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" +recived_time \
+                 + "|" + recived_url_send
         sql_phoenix = """UPSERT INTO ods.ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status)
                     VALUES('%(rowkey)s',
                     '%(recived_url_send)s',
@@ -49,22 +49,24 @@ def safeToPhoenix(data,cursor,conn):
                     )
                     """ % {"rowkey": rowkey, 'recived_url_send': recived_url_send, "date": recived_time,
                            "status": recived_status}
-        logging.info(sql_phoenix)
+        logging.info("safe To Phoenix:" + sql_phoenix)
         cursor.execute(sql_phoenix)
     elif len(messagelist) < 2 or len(messagelist) > 12:
         logging.error("message is error")
         logging.error(recived_message)
-    elif len(messagelist) > 2 and len(messagelist) <= 12:
+    elif len(messagelist) > 3 and len(messagelist) <= 13:
         recived_url_send = messagelist[0]
         recived_status = messagelist[1]
-        recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        recived_time = messagelist[2]
         recived_results = ['', '', '', '', '', '', '', '', '', '']
-        rowkey = hashlib.md5(recived_url_send).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
-                 + recived_url_send
+        rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" + recived_time \
+                 + "|" + recived_url_send
         logging.info(rowkey)
         logging.info("list lenth:::" + str(len(messagelist)))
-        for i in range(2, len(messagelist)):
-            recived_results[i - 2] = messagelist[i]
+        for i in range(3, len(messagelist)):
+            recived_results[i - 3] = messagelist[i]
+        print "recived_results "
+        print recived_results
         sql_phoenix = """UPSERT INTO ods.ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status,result_1,result_2,result_3
             ,result_4,result_5,result_6,result_7,result_8,result_9,result_10)
             VALUES('%(rowkey)s',
@@ -80,7 +82,7 @@ def safeToPhoenix(data,cursor,conn):
                    "result_4": recived_results[3], "result_5": recived_results[4], "result_6": recived_results[5],
                    "result_7": recived_results[6], "result_8": recived_results[7], "result_9": recived_results[8],
                    "result_10": recived_results[9]}
-        logging.info(sql_phoenix)
+        logging.info("safe To Phoenix:" + sql_phoenix)
         cursor.execute(sql_phoenix)
         conn.commit()
 
@@ -98,11 +100,11 @@ def safeToMysql(data,cursor,conn):
         elif messagelist[1] == 'noCard':
             logging.warning(messagelist[0] + '---not VIP')
         recived_url_send = messagelist[0]
-        recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        recived_time = messagelist[2]
         recived_status = messagelist[1]
         print str(messagelist) + "fail"
-        rowkey = hashlib.md5(recived_url_send + datetime.datetime.now().strftime('%Y%m%d%H%M%S')).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
-                 + recived_url_send
+        rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" + recived_time \
+                 + "|" + recived_url_send
         sql_mysql = """INSERT INTO ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status)
                         VALUES('%(rowkey)s',
                         '%(recived_url_send)s',
@@ -111,23 +113,23 @@ def safeToMysql(data,cursor,conn):
                         )
                         """ % {"rowkey": rowkey, 'recived_url_send': recived_url_send, "date": recived_time,
                                "status": recived_status}
-        logging.info(sql_mysql)
+        logging.info("safeTo mysql:" + sql_mysql)
         cursor.execute(sql_mysql)
         conn.commit()
-    elif len(messagelist) < 2 or len(messagelist) > 12:
+    elif len(messagelist) < 3 or len(messagelist) > 13:
         logging.error("message is error")
         logging.error(recived_message)
-    elif len(messagelist) > 2 and len(messagelist) <= 12:
+    elif len(messagelist) > 3 and len(messagelist) <= 13:
         recived_url_send = messagelist[0]
         recived_status = messagelist[1]
-        recived_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        recived_time = messagelist[2]
         recived_results = ['', '', '', '', '', '', '', '', '', '']
-        rowkey = hashlib.md5(recived_url_send + datetime.datetime.now().strftime('%Y%m%d%H%M%S')).hexdigest() + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
-                 + recived_url_send
+        rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" + recived_time \
+                 + "|" + recived_url_send
         logging.info(rowkey)
         logging.info("list lenth:::" + str(len(messagelist)))
-        for i in range(2, len(messagelist)):
-            recived_results[i - 2] = messagelist[i]
+        for i in range(3, len(messagelist)):
+            recived_results[i - 3] = messagelist[i]
         sql_mysql = """INSERT INTO ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status,result_1,result_2,result_3
                 ,result_4,result_5,result_6,result_7,result_8,result_9,result_10)
                 VALUES('%(rowkey)s',
@@ -143,7 +145,7 @@ def safeToMysql(data,cursor,conn):
                        "result_4": recived_results[3], "result_5": recived_results[4], "result_6": recived_results[5],
                        "result_7": recived_results[6], "result_8": recived_results[7], "result_9": recived_results[8],
                        "result_10": recived_results[9]}
-        logging.info(sql_mysql)
+        logging.info("safeTo mysql:" + sql_mysql)
         cursor.execute(sql_mysql)
         conn.commit()
 
@@ -165,21 +167,18 @@ if __name__ == "__main__":
     mysql_cursor = mysql_conn.cursor()
 
     for message in kafka_consumer:
+        print message.value
         logging.debug("Recived message value from kafka topic msreply" + message.value)
         #通过phoenix 插入数据到hbase
         if CF.get("phoenix","enable") == "True":
             safeToPhoenix(data=message.value,cursor=phoenix_cursor,conn=phoenix_conn)
-            print "safe to phoenix doen"
+            print "safe to phoenix done"
         else:
             logging.debug("safe to Phoenix is no enable")
         #插入数据到mysql
         if CF.get("mysql","enable") == "True":
-            try:
-                safeToMysql(message.value,cursor=mysql_cursor,conn=mysql_conn)
-                print "safe to mysql doen"
-            except:
-                logging.warning("The same data")
-                print "Insert into mysql ERROR"
+            safeToMysql(message.value,cursor=mysql_cursor,conn=mysql_conn)
+            print  "safe to mysql done"
         else:
             logging.debug("safe to mysql is no enable")
 
