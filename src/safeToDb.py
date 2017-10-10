@@ -51,7 +51,7 @@ def safeToPhoenix(data,cursor,conn):
                            "status": recived_status}
         logging.info("safe To Phoenix:" + sql_phoenix)
         cursor.execute(sql_phoenix)
-    elif len(messagelist) < 2 or len(messagelist) > 12:
+    elif len(messagelist) < 3 or len(messagelist) > 12:
         logging.error("message is error")
         logging.error(recived_message)
     elif len(messagelist) > 3 and len(messagelist) <= 13:
@@ -92,7 +92,7 @@ def safeToMysql(data,cursor,conn):
     messagelist = recived_message.split(",")
     logging.info("mysql data" + str(messagelist))
     print messagelist
-    if len(messagelist) == 2:
+    if len(messagelist) == 3:
         if messagelist[1] == 'fail':
             logging.warning(messagelist[0] + "---url not Rec")
         elif messagelist[1] == 'noAvatar':
