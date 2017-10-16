@@ -31,6 +31,7 @@ def safeToPhoenix(data,cursor,conn):
     if len(messagelist) == 3:
         if messagelist[0] == 'heart beat':
             cursor.execute("select 1")
+            logging.info("heart beat success")
             return 'heart beat'
         elif messagelist[1] == 'fail' and messagelist[0] != 'heart beat':
             logging.info(messagelist[0] + "---url not Rec")
