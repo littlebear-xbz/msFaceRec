@@ -6,7 +6,7 @@ Created on Tue Jun 27 09:28:25 2017
 from kafka import KafkaConsumer
 import phoenixdb
 database_url = 'http://jp-bigdata-01:8765/'
-# database_url = 'http://jh-hadoop-02:8765/'
+# database_url = 'http://jh-hadoop-03:8765/'
 conn = phoenixdb.connect(database_url, autocommit=True)
 cursor = conn.cursor()
 cnx = conn
@@ -71,7 +71,8 @@ VALUES('3http://139.219.102.23:8003/JojoAndPage.jpg',
        "result_10": recived_results[9]}
 
 
-sql_l = 'select * from test.ltest'
+sql_l = """select * from ods.ODS_MSFACEREC_RECIVED where recived_time > '2017101309160000'
+        """
 
 
 # print recived_results

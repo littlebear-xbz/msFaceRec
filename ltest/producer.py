@@ -32,6 +32,6 @@ while count < 1000:
     line = random.choice(lines)
     producer.send(topic='mssend', value=line)
     print line
-    time.sleep(random.randint(1,60))
+    time.sleep(400)
     count = count+1
 # producer.flush()

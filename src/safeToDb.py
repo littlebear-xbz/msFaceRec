@@ -29,7 +29,10 @@ def safeToPhoenix(data,cursor,conn):
     logging.info(messagelist)
     # print messagelist
     if len(messagelist) == 3:
-        if messagelist[1] == 'fail':
+        if messagelist[0] == 'heart beat':
+            cursor.execute("select 1")
+            return 'heart beat'
+        elif messagelist[1] == 'fail' and messagelist[0] != 'heart beat':
             logging.info(messagelist[0] + "---url not Rec")
         elif messagelist[1] == 'noAvatar':
             logging.info(messagelist[0] + '---not found face')
@@ -84,7 +87,7 @@ def safeToPhoenix(data,cursor,conn):
                    "result_10": recived_results[9]}
         logging.info("safe To Phoenix:" + sql_phoenix)
         cursor.execute(sql_phoenix)
-        conn.commit()
+
 
 
 def safeToMysql(data,cursor,conn):
@@ -93,7 +96,10 @@ def safeToMysql(data,cursor,conn):
     logging.debug("mysql data" + str(messagelist))
     # print messagelist
     if len(messagelist) == 3:
-        if messagelist[1] == 'fail':
+        if messagelist[0] == 'heart beat':
+            print 'heart beat'
+            return 'heart beat'
+        elif messagelist[1] == 'fail' and messagelist[0] != 'heart beat':
             logging.info(messagelist[0] + "---url not Rec")
         elif messagelist[1] == 'noAvatar':
             logging.info(messagelist[0] + '---not found face')
@@ -149,14 +155,15 @@ def safeToMysql(data,cursor,conn):
         conn.commit()
 
 
+
 if __name__ == "__main__":
     print "process start"
     bootstrap_servers = CF.get("kafka","bootstrap").split(",")
-    kafka_topic = CF.get("kafka","topic")
+    kafka_topic = CF.get("kafka","topic_reply")
     kafka_group_id = CF.get("kafka","group_id")
     kafka_consumer = KafkaConsumer(kafka_topic,group_id=kafka_group_id,bootstrap_servers=bootstrap_servers)
     phoenix_url = CF.get("phoenix","url")
-    phoenix_conn = phoenixdb.connect(phoenix_url,autocommit=True)
+    phoenix_conn = phoenixdb.connect(phoenix_url,max_retries=3,autocommit=True)
     phoenix_cursor = phoenix_conn.cursor()
 
     mysql_conn = pymysql.connect(host=CF.get("mysql","ip"),port= int(CF.get("mysql","port")),\
