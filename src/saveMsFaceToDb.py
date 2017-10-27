@@ -17,10 +17,10 @@ import threading
 CF = ConfigParser.ConfigParser()
 CF.read('../conf/conf.conf')
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s:::] %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
-                    filename='../log/safeToDb.log',
+                    filename='../log/saveMsFaceToDb.log',
                     filemode='w'
                     )
 
