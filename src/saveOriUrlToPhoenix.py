@@ -36,9 +36,7 @@ def saveToPhoenix(data, cursor, conn):
     else:
         ods_data = json.loads(message)
         image_num = str(ods_data["ImgNum"])
-        print image_num
         camera_id = str(ods_data["CameraId"])
-        print camera_id
         camera_ip = str(ods_data["CameraIp"])
         time_send = str(ods_data["PassTime"])
         time_recive = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -58,7 +56,6 @@ def saveToPhoenix(data, cursor, conn):
                            ,"face_url": face_url
                            }
         logging.info("insert into phoenix" + sql)
-        print sql
         cursor.execute(sql)
 
 def kafkaToDb(phoenix_cursor, phoenix_conn):
