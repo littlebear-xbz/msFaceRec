@@ -24,7 +24,8 @@ logging.basicConfig(level=logging.DEBUG,
                     filemode='w'
                     )
 
-def safeToPhoenix(data,cursor,conn):
+
+def safeToPhoenix(data, cursor, conn):
     recived_message = data
     messagelist = recived_message.split(",")
     logging.info(messagelist)
@@ -32,7 +33,7 @@ def safeToPhoenix(data,cursor,conn):
     if len(messagelist) == 3:
         if messagelist[0] == 'heart beat':
             cursor.execute("select 1")
-            logging.info("heart beat success")
+            logging.info("phoenix heart beat success")
             return 'heart beat'
         elif messagelist[1] == 'fail' and messagelist[0] != 'heart beat':
             logging.info(messagelist[0] + "---url not Rec")
@@ -44,8 +45,8 @@ def safeToPhoenix(data,cursor,conn):
         recived_time = messagelist[2]
         recived_status = messagelist[1]
         # print str(messagelist) + "fail"
-        rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" +recived_time \
-                 + "|" + recived_url_send
+        rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" + recived_time \
+            + "|" + recived_url_send
         sql_phoenix = """UPSERT INTO ods.ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status)
                     VALUES('%(rowkey)s',
                     '%(recived_url_send)s',
@@ -65,7 +66,7 @@ def safeToPhoenix(data,cursor,conn):
         recived_time = messagelist[2]
         recived_results = ['', '', '', '', '', '', '', '', '', '']
         rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" + recived_time \
-                 + "|" + recived_url_send
+            + "|" + recived_url_send
         logging.debug(rowkey)
         logging.debug("list lenth:::" + str(len(messagelist)))
         for i in range(3, len(messagelist)):
@@ -90,14 +91,16 @@ def safeToPhoenix(data,cursor,conn):
         logging.info("safe To Phoenix:" + sql_phoenix)
         cursor.execute(sql_phoenix)
 
-def safeToMysql(data,cursor,conn):
+
+def safeToMysql(data, cursor, conn):
     recived_message = data
     messagelist = recived_message.split(",")
     logging.debug("mysql data" + str(messagelist))
     # print messagelist
     if len(messagelist) == 3:
         if messagelist[0] == 'heart beat':
-            print 'heart beat'
+            cursor.execute("select 1")
+            logging.info("mysql heart beat success")
             return 'heart beat'
         elif messagelist[1] == 'fail' and messagelist[0] != 'heart beat':
             logging.info(messagelist[0] + "---url not Rec")
@@ -154,32 +157,32 @@ def safeToMysql(data,cursor,conn):
         cursor.execute(sql_mysql)
         conn.commit()
 
-def kafkaToDb(phoenix_cursor,phoenix_conn):
+
+def kafkaToDb(phoenix_cursor, phoenix_conn,mysql_cursor,mysql_conn):
     bootstrap_servers = CF.get("kafka", "bootstrap").split(",")
     kafka_topic = CF.get("kafka", "topic_reply")
     kafka_group_id = CF.get("kafka", "group_id")
-    kafka_consumer = KafkaConsumer(kafka_topic, group_id=kafka_group_id, bootstrap_servers=bootstrap_servers)
-    mysql_conn = pymysql.connect(host=CF.get("mysql", "ip"), port=int(CF.get("mysql", "port")),
-                                 user=CF.get("mysql", "username"),
-                                 passwd=CF.get("mysql", "password"),
-                                 db=CF.get("mysql", "database"), charset='utf8')
-    mysql_cursor = mysql_conn.cursor()
+    kafka_consumer = KafkaConsumer(
+        kafka_topic, group_id=kafka_group_id, bootstrap_servers=bootstrap_servers)
 
     for message in kafka_consumer:
         print message.value
-        logging.debug("Recived message value from kafka topic ::" + message.value)
+        logging.debug(
+            "Recived message value from kafka topic ::" + message.value)
         # 通过phoenix 插入数据到hbase
         if CF.get("phoenix", "enable") == "True":
-            safeToPhoenix(data=message.value, cursor=phoenix_cursor, conn=phoenix_conn)
+            safeToPhoenix(data=message.value,
+                          cursor=phoenix_cursor, conn=phoenix_conn)
             print "safe to phoenix done"
         else:
             logging.debug("safe to Phoenix is no enable")
         # 插入数据到mysql
         if CF.get("mysql", "enable") == "True":
             safeToMysql(message.value, cursor=mysql_cursor, conn=mysql_conn)
-            print  "safe to mysql done"
+            print "safe to mysql done"
         else:
             logging.debug("safe to mysql is no enable")
+
 
 def keepConn(cur):
     while True:
@@ -188,22 +191,28 @@ def keepConn(cur):
         print "keep alive"
         time.sleep(200)
 
+
 def main():
     print "process start"
     phoenix_url = CF.get("phoenix", "url")
-    phoenix_conn = phoenixdb.connect(phoenix_url, max_retries=3, autocommit=True)
+    phoenix_conn = phoenixdb.connect(
+        phoenix_url, max_retries=3, autocommit=True)
     phoenix_cursor = phoenix_conn.cursor()
-    kafkaToDb_thread = threading.Thread(target=kafkaToDb,args=(phoenix_cursor,phoenix_conn,))
-    keepConn_thread = threading.Thread(target=keepConn,args=(phoenix_cursor,))
+
+    mysql_conn = pymysql.connect(host=CF.get("mysql", "ip"), port=int(CF.get("mysql", "port")),
+                                 user=CF.get("mysql", "username"),
+                                 passwd=CF.get("mysql", "password"),
+                                 db=CF.get("mysql", "database"), charset='utf8')
+    mysql_cursor = mysql_conn.cursor()
+
+    kafkaToDb_thread = threading.Thread(
+        target=kafkaToDb, args=(phoenix_cursor, phoenix_conn,mysql_cursor,mysql_conn))
+    keepConn_thread = threading.Thread(target=keepConn, args=(phoenix_cursor,))
     kafkaToDb_thread.start()
     keepConn_thread.start()
     kafkaToDb_thread.join()
     keepConn_thread.join()
 
+
 if __name__ == "__main__":
     main()
-
-
-
-
-
