@@ -5,15 +5,13 @@ Created on Thu Jun 29 10:35:35 2017
 """
 import sys
 from kafka import KafkaConsumer
-from kafka.client import KafkaClient
-from kafka.consumer import SimpleConsumer
 import logging
 import ConfigParser
+import json
 CF = ConfigParser.ConfigParser()
 CF.read('../conf/conf.conf')
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
@@ -28,7 +26,7 @@ server_list_jh = ['jh-hadoop-10:9092','jh-hadoop-11:9092','jh-hadoop-12:9092','j
                   'jh-hadoop-16:9092','jh-hadoop-17:9092','jh-hadoop-18:9092']
 server_list_jx = ['jx-bigdata-03:9092', 'jx-bigdata-04:9092', 'jx-bigdata-05:9092','jx-bigdata-06:9092']
 
-consumer = KafkaConsumer('ltest', group_id='groupJp',bootstrap_servers=server_list)
+consumer = KafkaConsumer('mssend', group_id='groupJp',bootstrap_servers=server_list)
 
 
 def listenTopic():
@@ -41,6 +39,12 @@ def listenTopic():
 def test():
     test = listenTopic()
     for i in test:
-        print i
+        # print i
+        if i == 'heart beat':
+            print 'heart bear'
+            pass
+        else:
+            message = json.loads(i)
+            print message["FaceUrl"]
 
 test()

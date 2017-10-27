@@ -39,7 +39,7 @@ recived_txt = "5http://139.219.102.23:8003/JojoAndPage.jpg,success,http://wh-dev
 tmp = recived_txt.split(",")
 url_send = tmp[0]
 recived_status = tmp[1]
-recived_results = ['','','','','','','','','','']
+recived_results = ['', '', '', '', '', '', '', '', '', '']
 recived_results[0] = "ceshi123"
 recived_results[1] = "ceshi1234"
 sql_l = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status,result_1,result_2,result_3
@@ -51,9 +51,9 @@ VALUES('3http://139.219.102.23:8003/JojoAndPage.jpg',
 '%(result_1)s','%(result_2)s','%(result_3)s','%(result_4)s','%(result_5)s','%(result_6)s',
 '%(result_7)s','%(result_8)s','%(result_9)s','%(result_10)s'
 )
-""" % {"result_1":recived_results[0],"result_2":recived_results[1],"result_3":recived_results[2],
-       "result_4": recived_results[3],"result_5":recived_results[4],"result_6":recived_results[5],
-       "result_7": recived_results[6],"result_8":recived_results[7],"result_9":recived_results[8],
+""" % {"result_1": recived_results[0], "result_2": recived_results[1], "result_3": recived_results[2],
+       "result_4": recived_results[3], "result_5": recived_results[4], "result_6": recived_results[5],
+       "result_7": recived_results[6], "result_8": recived_results[7], "result_9": recived_results[8],
        "result_10": recived_results[9]}
 
 sql_l2 = """UPSERT INTO test.LTEST(RowSets,send_url,recived_time,status,result_1,result_2,result_3
@@ -65,9 +65,9 @@ VALUES('3http://139.219.102.23:8003/JojoAndPage.jpg',
 '%(result_1)s','%(result_2)s','%(result_3)s','%(result_4)s','%(result_5)s','%(result_6)s',
 '%(result_7)s','%(result_8)s','%(result_9)s','%(result_10)s'
 )
-""" % {"result_1":recived_results[0],"result_2":recived_results[1],"result_3":recived_results[2],
-       "result_4": recived_results[3],"result_5":recived_results[4],"result_6":recived_results[5],
-       "result_7": recived_results[6],"result_8":recived_results[7],"result_9":recived_results[8],
+""" % {"result_1": recived_results[0], "result_2": recived_results[1], "result_3": recived_results[2],
+       "result_4": recived_results[3], "result_5": recived_results[4], "result_6": recived_results[5],
+       "result_7": recived_results[6], "result_8": recived_results[7], "result_9": recived_results[8],
        "result_10": recived_results[9]}
 
 
@@ -79,5 +79,3 @@ sql_l = """select * from ods.ODS_MSFACEREC_RECIVED where recived_time > '2017101
 cursor.execute(sql_l)
 for i in cursor.fetchall():
     print i
-
-

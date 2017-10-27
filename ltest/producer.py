@@ -7,6 +7,7 @@ import os
 import sys
 from kafka import KafkaProducer
 import time
+import json
 import random
 
 reload(sys)
@@ -18,20 +19,34 @@ server_list = ['jp-bigdata-03:9092', 'jp-bigdata-04:9092', 'jp-bigdata-05:9092',
 producer = KafkaProducer(bootstrap_servers=server_list)
 
 lines = [
-"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/ltest1.jpg"}""",
-"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/ltest2.jpg"}""",
-"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/ltest3.jpg"}""",
-"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/ltest4.jpg"}""",
-"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01/images/cannotfindpeople.jpg"}""",
-"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01/images/cannotfindpeople1.jpg"}""",
-"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01/images/fail.jpg"}"""
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/1.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/2.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/3.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/4.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/5.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/6.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/7.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/8.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/9.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/10.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/11.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/12.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/13.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/15.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/16.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/17.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/18.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/19.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/20.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/21.jpg"}""",
+"""{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/22.jpg"}"""
 ]
 
 count = 0
-while count < 1000:
-    line = random.choice(lines)
+while count < 2:
+    line = lines[count]
     producer.send(topic='mssend', value=line)
     print line
-    time.sleep(400)
+    time.sleep(0.1)
     count = count+1
 # producer.flush()
