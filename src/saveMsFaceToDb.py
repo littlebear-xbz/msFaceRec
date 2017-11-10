@@ -205,8 +205,7 @@ def main():
                                  db=CF.get("mysql", "database"), charset='utf8')
     mysql_cursor = mysql_conn.cursor()
 
-    kafkaToDb_thread = threading.Thread(
-        target=kafkaToDb, args=(phoenix_cursor, phoenix_conn,mysql_cursor,mysql_conn))
+    kafkaToDb_thread = threading.Thread(target=kafkaToDb, args=(phoenix_cursor, phoenix_conn,mysql_cursor,mysql_conn))
     keepConn_thread = threading.Thread(target=keepConn, args=(phoenix_cursor,))
     kafkaToDb_thread.start()
     keepConn_thread.start()

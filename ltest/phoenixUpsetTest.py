@@ -10,5 +10,5 @@ while True:
     time_test = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute("UPSERT INTO test.LTEST VALUES (?, ?)", (time_test, time_test))
     print "save ok " + str(datetime.datetime.now())
-    sleep(599)
+    sleep(1100)
 

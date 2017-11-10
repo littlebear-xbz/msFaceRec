@@ -42,11 +42,11 @@ lines = [
 """{"ImgNum":"12","CameraId":12,"CameraIp":"12","PassTime":"12","FaceUrl":"http://jp-bigdata-01:/images/22/full/22.jpg"}"""
 ]
 
-count = 0
-while count < 2:
+count = 5
+while count < 24:
     line = lines[count]
     producer.send(topic='mssend', value=line)
     print line
-    time.sleep(0.1)
+    time.sleep(350)
     count = count+1
 # producer.flush()
