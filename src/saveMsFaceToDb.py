@@ -30,20 +30,20 @@ def safeToPhoenix(data, cursor, conn):
     messagelist = recived_message.split(",")
     logging.info(messagelist)
     # print messagelist
-    if len(messagelist) == 3:
+    if len(messagelist) == 4:
         if messagelist[0] == 'heart beat':
             cursor.execute("select 1")
             logging.info("phoenix heart beat success")
             return 'heart beat'
-        elif messagelist[1] == 'fail' and messagelist[0] != 'heart beat':
+        elif messagelist[2] == 'fail' and messagelist[0] != 'heart beat':
             logging.info(messagelist[0] + "---url not Rec")
-        elif messagelist[1] == 'noAvatar':
+        elif messagelist[2] == 'noAvatar':
             logging.info(messagelist[0] + '---not found face')
-        elif messagelist[1] == 'noCard':
+        elif messagelist[2] == 'noCard':
             logging.info(messagelist[0] + '---not VIP')
         recived_url_send = messagelist[0]
-        recived_time = messagelist[2]
-        recived_status = messagelist[1]
+        recived_time = messagelist[3]
+        recived_status = messagelist[2]
         # print str(messagelist) + "fail"
         rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" + recived_time \
             + "|" + recived_url_send
@@ -57,20 +57,20 @@ def safeToPhoenix(data, cursor, conn):
                            "status": recived_status}
         logging.info("safe To Phoenix:" + sql_phoenix)
         cursor.execute(sql_phoenix)
-    elif len(messagelist) < 3 or len(messagelist) > 12:
+    elif len(messagelist) < 4 or len(messagelist) > 13:
         logging.error("message is error")
         logging.error(recived_message)
-    elif len(messagelist) > 3 and len(messagelist) <= 13:
+    elif len(messagelist) > 4 and len(messagelist) <= 13:
         recived_url_send = messagelist[0]
-        recived_status = messagelist[1]
-        recived_time = messagelist[2]
+        recived_status = messagelist[2]
+        recived_time = messagelist[3]
         recived_results = ['', '', '', '', '', '', '', '', '', '']
         rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest() + "|" + recived_time \
             + "|" + recived_url_send
         logging.debug(rowkey)
         logging.debug("list lenth:::" + str(len(messagelist)))
-        for i in range(3, len(messagelist)):
-            recived_results[i - 3] = messagelist[i]
+        for i in range(4, len(messagelist)):
+            recived_results[i - 4] = messagelist[i]
         # print "recived_results "
         # print recived_results
         sql_phoenix = """UPSERT INTO ods.ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status,result_1,result_2,result_3
@@ -97,20 +97,20 @@ def safeToMysql(data, cursor, conn):
     messagelist = recived_message.split(",")
     logging.debug("mysql data" + str(messagelist))
     # print messagelist
-    if len(messagelist) == 3:
+    if len(messagelist) == 4:
         if messagelist[0] == 'heart beat':
             cursor.execute("select 1")
             logging.info("mysql heart beat success")
             return 'heart beat'
-        elif messagelist[1] == 'fail' and messagelist[0] != 'heart beat':
+        elif messagelist[2] == 'fail' and messagelist[0] != 'heart beat':
             logging.info(messagelist[0] + "---url not Rec")
-        elif messagelist[1] == 'noAvatar':
+        elif messagelist[2] == 'noAvatar':
             logging.info(messagelist[0] + '---not found face')
-        elif messagelist[1] == 'noCard':
+        elif messagelist[2] == 'noCard':
             logging.info(messagelist[0] + '---noCard')
         recived_url_send = messagelist[0]
-        recived_time = messagelist[2]
-        recived_status = messagelist[1]
+        recived_time = messagelist[3]
+        recived_status = messagelist[2]
         # print str(messagelist)
         rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest()
         sql_mysql = """REPLACE INTO ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status)
@@ -124,20 +124,20 @@ def safeToMysql(data, cursor, conn):
         logging.info("safeTo mysql:" + sql_mysql)
         cursor.execute(sql_mysql)
         conn.commit()
-    elif len(messagelist) < 3 or len(messagelist) > 13:
+    elif len(messagelist) < 4 or len(messagelist) > 13:
         logging.error("message is error")
         logging.error(recived_message)
-    elif len(messagelist) > 3 and len(messagelist) <= 13:
+    elif len(messagelist) > 4 and len(messagelist) <= 13:
         logging.info("success:::catch a person")
         recived_url_send = messagelist[0]
-        recived_status = messagelist[1]
-        recived_time = messagelist[2]
+        recived_status = messagelist[2]
+        recived_time = messagelist[3]
         recived_results = ['', '', '', '', '', '', '', '', '', '']
         rowkey = hashlib.md5(recived_url_send + recived_time).hexdigest()
         logging.debug(rowkey)
         logging.debug("list lenth:::" + str(len(messagelist)))
-        for i in range(3, len(messagelist)):
-            recived_results[i - 3] = messagelist[i]
+        for i in range(4, len(messagelist)):
+            recived_results[i - 4] = messagelist[i]
         sql_mysql = """REPLACE INTO ODS_MSFACEREC_RECIVED(RowSets,send_url,recived_time,status,result_1,result_2,result_3
                 ,result_4,result_5,result_6,result_7,result_8,result_9,result_10)
                 VALUES('%(rowkey)s',
@@ -158,7 +158,7 @@ def safeToMysql(data, cursor, conn):
         conn.commit()
 
 
-def kafkaToDb(phoenix_cursor, phoenix_conn,mysql_cursor,mysql_conn):
+def kafkaToDb(phoenix_cursor, phoenix_conn, mysql_cursor, mysql_conn):
     bootstrap_servers = CF.get("kafka", "bootstrap").split(",")
     kafka_topic = CF.get("kafka", "topic_reply")
     kafka_group_id = CF.get("kafka", "group_id")
@@ -205,7 +205,7 @@ def main():
                                  db=CF.get("mysql", "database"), charset='utf8')
     mysql_cursor = mysql_conn.cursor()
 
-    kafkaToDb_thread = threading.Thread(target=kafkaToDb, args=(phoenix_cursor, phoenix_conn,mysql_cursor,mysql_conn))
+    kafkaToDb_thread = threading.Thread(target=kafkaToDb, args=(phoenix_cursor, phoenix_conn, mysql_cursor, mysql_conn))
     keepConn_thread = threading.Thread(target=keepConn, args=(phoenix_cursor,))
     kafkaToDb_thread.start()
     keepConn_thread.start()
